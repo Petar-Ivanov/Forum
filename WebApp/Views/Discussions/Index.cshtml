@@ -1,0 +1,186 @@
+﻿@model WebApp.ViewModels.Discussions.IndexVM
+@using Messaging.Responses.ViewModels;
+@using WebApp.ExtentionMethods;
+@{
+    UserViewModel LoggedUser = this.ViewContext.HttpContext.Session.GetObject<UserViewModel>("loggedUser");
+}
+
+<div class="container">
+    <!-- Search Form -->
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            @{
+                if(Model.Topic != null)
+                {
+                    <h3>Topic: @Model.Topic</h3>
+                    <br />
+                }
+            }
+            
+            <form method ="get" action="@Url.Action("Search", "Discussions")" class="form-inline d-flex justify-content-center mb-3" style="max-width: 40rem;">
+                @if(Model.Topic != null)
+                {
+                    <input type="hidden" name="topic" value="@Model.Topic" />
+                }
+                <div class="form-group mx-sm-3 mb-2" style="flex-grow: 1;">
+                    <input type="text" class="form-control w-100 bg-dark text-white border-dark" name="searchTerm" id="searchTerm" placeholder="Search" value="@Model.SearchTerm">
+                </div>
+                <button type="submit" class="btn btn-dark mb-2">Search</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Discussion Button -->
+    <div class="row justify-content-center mb-3">
+        <div class="col-12 col-md-8 col-lg-6 text-center">
+            <form method="get" action="@Url.Action("Create", "Discussions")">
+                <button type="submit" class="btn btn-dark w-100" style="max-width: 40rem;">
+                    START A DISCUSSION
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Discussion List -->
+    <div class="discussion-list">
+        @foreach (var item in Model.Items.OrderByDescending(x => x.CreatedOn))
+        {
+            string timeSincePost = "";
+            if ((item.TimeDifference * 60) < 1) timeSincePost = "just now";
+            else if (item.TimeDifference < 1)
+            {
+                timeSincePost = (int)(item.TimeDifference * 60) + " minutes ago";
+            }
+            else if (item.TimeDifference > 24)
+            {
+                timeSincePost = (int)(item.TimeDifference / 24) + " days ago";
+            }
+            else
+            {
+                timeSincePost = (int)item.TimeDifference + " hours ago";
+            }
+
+            <div class="card text-white bg-dark mb-3 mx-auto" style="max-width: 40rem;">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        Posted by: <a style="color: #62686e; text-decoration: none;" href="@Url.Action("Details", "Users", new { id = item.CreatedById})">@item.CreatedBy</a> • @timeSincePost
+                        @if (item.IsUpdated)
+                        {
+                            <p style="display:inline">(Edited by: @item.UpdatedBy)</p>
+                        }
+                    </h6>
+                    <h5 class="card-title">@item.Title</h5>
+                    <p class="card-text">
+                        @foreach (var topic in item.Topics)
+                        {
+                            <span class="badge badge-dark">@topic</span>
+                        }
+                    </p>
+                    <p class="card-text">@item.Text</p>
+                    @if (item.Image != null)
+                    {
+                        <p>
+                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.Image)" alt="Discussion Image" style="max-width: 100%; height: auto;" />
+                        </p>
+                    }
+                    @*<div>
+                        <button id="likeButton" class="btn btn-primary" data-item-id="@itemId">Like</button>
+                        <span id="likeCount">@initialLikeCount</span> Likes
+                    </div> *@
+                    <div>
+                        @{
+                            string upVoteColor = "currentColor";
+                            string downVoteColor = "currentColor";
+                            if (LoggedUser != null && LoggedUser.DiscussionsUpVoted.Contains(item.Id ?? 1)) upVoteColor = "orange";
+                            if (LoggedUser != null && LoggedUser.DiscussionsDownVoted.Contains(item.Id ?? 1)) downVoteColor = "orange";
+                        }
+                        <form method="get" action="@Url.Action("VoteDiscussion", "Votes")" style="display: inline;">
+                            @*Page = Page, SearchTerm = SearchTerm, Topic = Topic}*@
+                            <input type="hidden" name="discussion_id" value="@item.Id" />
+                            <input type="hidden" name="page" value="@Model.Page" />
+                            @* <input type="hidden" name="searchTerm" value="@Model.SearchTerm" />
+                            <input type="hidden" name="topic" value="@Model.Topic" /> *@
+                            <button type="submit" name="voteType" value="up" class="btn btn-dark" data-toggle="tooltip" data-placement="bottom" title="Upvote">
+                                @* <svg fill="currentColor" height="16" icon-name="upvote-outline" viewBox="0 0 20 20" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M12.877 19H7.123A1.125 1.125 0 0 1 6 17.877V11H2.126a1.114 1.114 0 0 1-1.007-.7 1.249 1.249 0 0 1 .171-1.343L9.166.368a1.128 1.128 0 0 1 1.668.004l7.872 8.581a1.25 1.25 0 0 1 .176 1.348 1.113 1.113 0 0 1-1.005.7H14v6.877A1.125 1.125 0 0 1 12.877 19ZM7.25 17.75h5.5v-8h4.934L10 1.31 2.258 9.75H7.25v8ZM2.227 9.784l-.012.016c.01-.006.014-.01.012-.016Z"></path></svg> *@
+                                <svg fill="@upVoteColor" height="16" icon-name="upvote-outline" viewBox="0 0 20 20" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M12.877 19H7.123A1.125 1.125 0 0 1 6 17.877V11H2.126a1.114 1.114 0 0 1-1.007-.7 1.249 1.249 0 0 1 .171-1.343L9.166.368a1.128 1.128 0 0 1 1.668.004l7.872 8.581a1.25 1.25 0 0 1 .176 1.348 1.113 1.113 0 0 1-1.005.7H14v6.877A1.125 1.125 0 0 1 12.877 19ZM7.25 17.75h5.5v-8h4.934L10 1.31 2.258 9.75H7.25v8ZM2.227 9.784l-.012.016c.01-.006.014-.01.012-.016Z"></path></svg>
+                                @item.UpVoteCount
+                            </button>
+                            <button type="submit" name="voteType" value="down" class="btn btn-dark" data-toggle="tooltip" data-placement="bottom" title="Downvote">
+                                <svg fill="@downVoteColor" height="16" icon-name="downvote-outline" viewBox="0 0 20 20" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M10 20a1.122 1.122 0 0 1-.834-.372l-7.872-8.581A1.251 1.251 0 0 1 1.118 9.7 1.114 1.114 0 0 1 2.123 9H6V2.123A1.125 1.125 0 0 1 7.123 1h5.754A1.125 1.125 0 0 1 14 2.123V9h3.874a1.114 1.114 0 0 1 1.007.7 1.25 1.25 0 0 1-.171 1.345l-7.876 8.589A1.128 1.128 0 0 1 10 20Zm-7.684-9.75L10 18.69l7.741-8.44H12.75v-8h-5.5v8H2.316Zm15.469-.05c-.01 0-.014.007-.012.013l.012-.013Z"></path></svg>
+                                @item.DownVoteCount
+                            </button>
+                        </form>
+                        @* <form method="get" action="@Url.Action("Details", "Discussions")" style="display: inline;"> *@
+                        <form method="get" action="@Url.Action("View", "Views")" style="display: inline;">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-dark" data-toggle="tooltip" data-placement="bottom" title="Comment">
+                                <svg aria-hidden="true" class="icon-comment" fill="currentColor" height="20" icon-name="comment-outline" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7.725 19.872a.718.718 0 0 1-.607-.328.725.725 0 0 1-.118-.397V16H3.625A2.63 2.63 0 0 1 1 13.375v-9.75A2.629 2.629 0 0 1 3.625 1h12.75A2.63 2.63 0 0 1 19 3.625v9.75A2.63 2.63 0 0 1 16.375 16h-4.161l-4 3.681a.725.725 0 0 1-.489.191ZM3.625 2.25A1.377 1.377 0 0 0 2.25 3.625v9.75a1.377 1.377 0 0 0 1.375 1.375h4a.625.625 0 0 1 .625.625v2.575l3.3-3.035a.628.628 0 0 1 .424-.165h4.4a1.377 1.377 0 0 0 1.375-1.375v-9.75a1.377 1.377 0 0 0-1.374-1.375H3.625Z"></path></svg>
+                                @item.CommentCount
+                            </button>
+                        </form>
+                        <svg aria-hidden="true" class="icon-eye" fill="none" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5C7 4.5 3.19 8 1.5 12c1.69 4 5.5 7.5 10.5 7.5s8.81-3.5 10.5-7.5c-1.69-4-5.5-7.5-10.5-7.5z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9a3 3 0 100 6 3 3 0 000-6z" /></svg>
+                        @item.ViewCount
+                        
+                    </div>
+                    
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation example">
+        @{
+            string action = "Index";
+            if (Model.Topic != null) action = "GetByTopic";
+            else if (Model.SearchTerm != null) action = "Search";
+
+            int thisPage = Model.Page ?? 1;
+            int prev = thisPage <= 1 ? thisPage : (thisPage - 1);
+            int next = thisPage >= Model.PageCount ? thisPage : thisPage + 1;
+        }
+        <ul class="pagination justify-content-center">
+            <li class="page-item">
+                <a class="page-link bg-dark text-white border-dark" href="@Url.Action(@action, "Discussions", new { Page = prev, SearchTerm = Model.SearchTerm, Topic = Model.Topic })">Previous</a>
+            </li>
+            @for (int i = 1; i<=Model.PageCount; i++)
+            {
+                <li class="page-item">
+                    
+                    <a class="page-link bg-dark text-white border-dark" href="@Url.Action(@action, "Discussions", new { Page = i, SearchTerm = Model.SearchTerm, Topic = Model.Topic })">@i</a>
+                </li>
+            }
+            <li class="page-item">
+                <a class="page-link bg-dark text-white border-dark" href="@Url.Action(@action, "Discussions", new { Page = next, SearchTerm = Model.SearchTerm, Topic = Model.Topic })">Next</a>
+            </li>
+        </ul>
+    </nav>
+
+</div>
+
+<script>
+    // Function to store the current scroll position in session storage
+    function saveScrollPosition() {
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+    }
+
+    // Attach the function to beforeunload event to save scroll position before the page unloads
+    window.addEventListener('beforeunload', saveScrollPosition);
+
+    // Function to restore the scroll position immediately
+    function restoreScrollPosition() {
+        const scrollPosition = sessionStorage.getItem('scrollPosition');
+        if (scrollPosition !== null) {
+            window.scrollTo(0, parseInt(scrollPosition, 10));
+        }
+    }
+
+    // Ensure the scroll position is restored immediately
+    window.addEventListener('DOMContentLoaded', restoreScrollPosition);
+    window.addEventListener('load', restoreScrollPosition);
+
+    // Optionally use history scrollRestoration for a smoother experience
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+</script>

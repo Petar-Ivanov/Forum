@@ -1,0 +1,31 @@
+﻿@model WebApp.ViewModels.Users.LoginVM
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <h1>Login</h1>
+            <br /><br />
+            <form method="post" action="@Url.Action("Login", "Users")" enctype="multipart/form-data" style="max-width: 40rem;">
+                <!-- Username -->
+                <div class="form-group d-flex justify-content-between align-items-center">
+                    <label for="Username" class="ml-3 text-white">Username</label>
+                    <input type="text" class="form-control bg-dark text-white border-dark w-75" id="Username" name="Username" placeholder="Username" value="@Model.Username">
+                </div>
+                <br />
+
+                <!-- Password -->
+                <div class="form-group d-flex justify-content-between align-items-center">
+                    <label for="Password" class="ml-3 text-white">Password</label>
+                    <input type="password" class="form-control bg-dark text-white border-dark w-75" id="Password" name="Password" placeholder="Password" value="@Model.Password">
+                </div>
+                <br />
+
+                <!-- Submit Button -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-dark w-100">Submit</button>
+                </div>
+                <br />
+            </form>
+        </div>
+    </div>
+</div>

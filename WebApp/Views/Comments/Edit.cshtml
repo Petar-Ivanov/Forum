@@ -1,0 +1,29 @@
+﻿@model WebApp.ViewModels.Comments.EditVM
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <h1>Edit Comment</h1>
+            <br /><br />
+            <form method="post" action="@Url.Action("Edit", "Comments")" enctype="multipart/form-data" style="max-width: 40rem;">
+                <input type="hidden" name="DiscussionId" value="@Model.Comment.DiscussionId" />
+                <input type="hidden" name="UserId" value="@Model.Comment.UserId" />
+                <!-- Discussion Text -->
+                <div class="form-group">
+                    <label for="Text" class="text-white">Comment Text</label>
+                    <textarea class="form-control bg-dark text-white border-dark" id="Text" name="Text" rows="5" placeholder="Discussion Text">@Model.Comment.Text</textarea>
+                    <span asp-validation-for="Text" class="text-danger"></span>
+                </div>
+                <br />
+
+                <input type="hidden" name="IsUpdated" value="@Model.Comment.IsUpdated)" />
+
+                <!-- Submit Button -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-dark w-100">Submit</button>
+                </div>
+                <br />
+            </form>
+        </div>
+    </div>
+</div>

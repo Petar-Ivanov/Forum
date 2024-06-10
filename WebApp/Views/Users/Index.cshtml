@@ -1,0 +1,78 @@
+﻿@model WebApp.ViewModels.Users.IndexVM
+
+<div class="container">
+    <!-- Search Form -->
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <form method="get" action="@Url.Action("Search", "Users")" class="form-inline d-flex justify-content-center mb-3" style="max-width: 40rem;">
+                <div class="form-group mx-sm-3 mb-2" style="flex-grow: 1;">
+                    <input type="text" class="form-control w-100 bg-dark text-white border-dark" name="searchTerm" id="searchTerm" placeholder="Search" value="@Model.SearchTerm">
+                </div>
+                <button type="submit" class="btn btn-dark mb-2">Search</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Topics List -->
+    <div class="discussion-list">
+        @foreach (var item in Model.Items.OrderBy(x => x.Username))
+        {
+            <div class="card text-white bg-dark mb-3 mx-auto" style="max-width: 40rem;">
+                <div class="card-body">
+                    <h5 class="card-title" style="display:inline">
+                        <a style="color: #62686e; text-decoration: none;" href="@Url.Action("Details", "Users", new { id = item.Id})">@item.Username</a> ( @item.Country )
+                    </h5>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation example">
+        @{
+            string action = "Index";
+            if (Model.SearchTerm != null) action = "Search";
+
+            int thisPage = Model.Page ?? 1;
+            int prev = thisPage <= 1 ? thisPage : (thisPage - 1);
+            int next = thisPage >= Model.PageCount ? thisPage : thisPage + 1;
+        }
+        <ul class="pagination justify-content-center">
+            <li class="page-item">
+                <a class="page-link bg-dark text-white border-dark" href="@Url.Action(@action, "Users", new { Page = prev, SearchTerm = Model.SearchTerm })">Previous</a>
+            </li>
+            @for (int i = 1; i <= Model.PageCount; i++)
+            {
+                <li class="page-item">
+                    <a class="page-link bg-dark text-white border-dark" href="@Url.Action(@action, "Users", new { Page = i, SearchTerm = Model.SearchTerm })">@i</a>
+                </li>
+            }
+            <li class="page-item">
+                <a class="page-link bg-dark text-white border-dark" href="@Url.Action(@action, "Users", new { Page = next, SearchTerm = Model.SearchTerm })">Next</a>
+            </li>
+        </ul>
+    </nav>
+
+</div>
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const collapsibleButtons = document.querySelectorAll('.collapsible-button');
+
+        collapsibleButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.getAttribute('data-target');
+                const collapsibleContent = document.getElementById(targetId);
+
+                if (collapsibleContent.style.display === 'none' || collapsibleContent.style.display === '') {
+                    collapsibleContent.style.display = 'block';
+                } else {
+                    collapsibleContent.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>

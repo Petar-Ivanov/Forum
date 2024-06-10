@@ -1,0 +1,37 @@
+﻿@model WebApp.ViewModels.Topics.EditVM
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <h1>Edit Topic</h1>
+            <br /><br />
+            <form method="post" action="@Url.Action("Edit", "Topics")" enctype="multipart/form-data" style="max-width: 40rem;">
+                <!-- Name -->
+                <div class="form-group d-flex justify-content-between align-items-center">
+                    <label for="Name" class="ml-3 text-white">Name</label>
+                    <input type="text" class="form-control bg-dark text-white border-dark w-75" id="Name" name="Name" placeholder="Topic Name" value="@Model.Topic.Name">
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                    @if (Model.UniqueNameError ?? false)
+                    {
+                        <p class="text-danger">*Name must be unique!</p>
+                    }
+                </div>
+                <br />
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label for="Description" class="text-white">Description</label>
+                    <textarea class="form-control bg-dark text-white border-dark" id="Description" name="Description" rows="5" placeholder="Description">@Model.Topic.Description</textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                <br />
+
+                <!-- Submit Button -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-dark w-100">Submit</button>
+                </div>
+                <br />
+            </form>
+        </div>
+    </div>
+</div>

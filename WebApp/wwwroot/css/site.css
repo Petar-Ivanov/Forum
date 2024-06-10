@@ -1,0 +1,35 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+    background-color: #1b1e21 /*#212529*/;
+    color: #ffffff;
+}
+
+.footer {
+    background-color: #212529;
+}
+
+.collapsible-content {
+    display: none;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #1b1e21;
+}

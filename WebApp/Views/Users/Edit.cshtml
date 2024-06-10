@@ -1,0 +1,91 @@
+﻿@model WebApp.ViewModels.Users.EditVM
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <h1>Edit Info</h1>
+            <br /><br />
+            <form method="post" action="@Url.Action("Edit", "Users")" enctype="multipart/form-data" style="max-width: 40rem;">
+                <input type="hidden" name="UserId" value="@Model.UserId" />
+                <!-- Username -->
+                <div class="form-group d-flex justify-content-between align-items-center">
+                    <label for="Username" class="ml-3 text-white">Username</label>
+                    <input type="text" class="form-control bg-dark text-white border-dark w-75" id="Username" name="Username" placeholder="Username" value="@Model.User.Username">
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+                <br />
+
+                <!-- Password -->
+                <div class="form-group d-flex justify-content-between align-items-center">
+                    <label for="Password" class="ml-3 text-white">Password</label>
+                    <input type="password" class="form-control bg-dark text-white border-dark w-75" id="Password" name="Password" placeholder="Password" value="@Model.User.Password">
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <br />
+
+                <!-- Email -->
+                <div class="form-group d-flex justify-content-between align-items-center">
+                    <label for="Email" class="ml-3 text-white">Email</label>
+                    <input type="text" class="form-control bg-dark text-white border-dark w-75" id="Email" name="Email" placeholder="Email" value="@Model.User.Email">
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <br />
+
+                <!-- Country -->
+                <div class="form-group d-flex justify-content-between align-items-center">
+                    <label for="Country" class="ml-3 text-white">Country</label>
+                    <select class="form-control bg-dark text-white border-dark w-75" id="Country" name="Country">
+                        @if (Model.User.Country == "Bulgaria")
+                        {
+                            <option value="Bulgaria" selected>Bulgaria</option>
+                        }
+                        else
+                        {
+                            <option value="Bulgaria">Bulgaria</option>
+                        }
+                        @foreach (string country in CountryManager.Countries)
+                        {
+                            if(Model.User.Country == country)
+                            {
+                                <option value="@country" selected>@country</option>
+                            }
+                            else
+                            {
+                                <option value="@country">@country</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="Country" class="text-danger"></span>
+                </div>
+                <br />
+
+                <!-- Birthdate -->
+                <div class="form-group d-flex justify-content-between align-items-center">
+                    <label for="Birthdate" class="ml-3 text-white">Birthdate</label>
+                    <input type="date" class="form-control bg-dark text-white border-dark w-75" id="Birthdate" name="Birthdate" placeholder="Birthdate" value="@Model.User.BirthDay.ToString("yyyy-MM-dd")">
+                    <span asp-validation-for="BirthDate" class="text-danger"></span>
+                </div>
+                <br />
+
+                <!-- Biography-->
+                <div class="form-group">
+                    <label for="Biography" class="text-white">Biography</label><br />
+                    <textarea class="form-control bg-dark text-white border-dark" id="Biography" name="Biography" rows="5" placeholder="Biography">@Model.User.Biography</textarea>
+                    <span asp-validation-for="Biography" class="text-danger"></span>
+                </div>
+                <br />
+
+                @if (Model.UniquePropertiesError ?? false)
+                {
+                    <p class="text-danger">*Username and email must be unique!</p>
+                }
+
+                <!-- Submit Button -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-dark w-100">Submit</button>
+                </div>
+                <br />
+            </form>
+        </div>
+    </div>
+</div>

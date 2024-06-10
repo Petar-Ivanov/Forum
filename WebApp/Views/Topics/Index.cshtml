@@ -1,0 +1,140 @@
+﻿@model WebApp.ViewModels.Topics.IndexVM
+@using Messaging.Responses.ViewModels;
+@using WebApp.ExtentionMethods;
+@{
+    UserViewModel LoggedUser = this.ViewContext.HttpContext.Session.GetObject<UserViewModel>("loggedUser");
+}
+
+<div class="container">
+    <!-- Search Form -->
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <form method="get" action="@Url.Action("Search", "Topics")" class="form-inline d-flex justify-content-center mb-3" style="max-width: 40rem;">
+                <div class="form-group mx-sm-3 mb-2" style="flex-grow: 1;">
+                    <input type="text" class="form-control w-100 bg-dark text-white border-dark" name="searchTerm" id="searchTerm" placeholder="Search" value="@Model.SearchTerm">
+                </div>
+                <button type="submit" class="btn btn-dark mb-2">Search</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Topic Button -->
+    <div class="row justify-content-center mb-3">
+        <div class="col-12 col-md-8 col-lg-6 text-center">
+            <form method="get" action="@Url.Action("Create", "Topics")">
+                <button type="submit" class="btn btn-dark w-100" style="max-width: 40rem;">
+                    ADD TOPIC
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Topics List -->
+    <div class="discussion-list">
+        @foreach (var item in Model.Items.ToList())
+        {
+            string timeSincePost = "";
+            if ((item.TimeDifference * 60) < 1) timeSincePost = "just now";
+            else if (item.TimeDifference < 1)
+            {
+                timeSincePost = (int)(item.TimeDifference * 60) + " minutes ago";
+            }
+            else if (item.TimeDifference > 24)
+            {
+                timeSincePost = (int)(item.TimeDifference / 24) + " days ago";
+            }
+            else
+            {
+                timeSincePost = (int)item.TimeDifference + " hours ago";
+            }
+
+            <div class="card text-white bg-dark mb-3 mx-auto" style="max-width: 40rem;">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        Posted by: <a style="color: #62686e; text-decoration: none;" href="@Url.Action("Details", "Users", new { id = item.CreatedById})">@item.CreatedBy</a> • @timeSincePost
+                    </h6>
+                    <h5 class="card-title" style="display:inline">@item.Name (@item.DiscussionCount)</h5>
+                    @* <p class="card-text">@item.Description</p> *@
+                    
+                    @* <button class="btn btn-dark" style="display:inline">View Discussions</button> *@
+                    <button class="collapsible-button btn btn-dark" data-target="collapsible-@item.Id" style="display:inline">
+                        <svg aria-hidden="true" fill="currentColor" height="10" viewBox="0 0 24 24" width="10" xmlns="http://www.w3.org/2000/svg" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14L6 6h12z"/></svg>
+                    </button>
+                    <div id="collapsible-@item.Id" class="collapsible-content">
+                        @item.Description
+                    </div>
+                        <form method="get" action="@Url.Action("GetByTopic", "Discussions")" style="display: inline;">
+                            <input type="hidden" name="topic" value="@item.Name" />
+                            <button type="submit" class="btn btn-dark" data-toggle="tooltip" data-placement="bottom" title="Delete">
+                                See Discussions
+                            </button>
+                        </form>
+                        @if (LoggedUser != null && LoggedUser.Username == item.CreatedBy)
+                        {
+                            <form method="get" action="@Url.Action("Edit", "Topics")" style="display: inline;">
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn btn-dark" data-toggle="tooltip" data-placement="bottom" title="Edit">
+                                    Edit
+                                </button>
+                            </form>
+                            <form method="get" action="@Url.Action("Delete", "Topics")" style="display: inline;">
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn btn-dark" data-toggle="tooltip" data-placement="bottom" title="Delete">
+                                    Delete
+                                </button>
+                            </form>
+                        }
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation example">
+        @{
+            string action = "Index";
+            if (Model.SearchTerm != null) action = "Search";
+
+            int thisPage = Model.Page ?? 1;
+            int prev = thisPage <= 1 ? thisPage : (thisPage - 1);
+            int next = thisPage >= Model.PageCount ? thisPage : thisPage + 1;
+        }
+        <ul class="pagination justify-content-center">
+            <li class="page-item">
+                <a class="page-link bg-dark text-white border-dark" href="@Url.Action(@action, "Topics", new { Page = prev, SearchTerm = Model.SearchTerm })">Previous</a>
+            </li>
+            @for (int i = 1; i <= Model.PageCount; i++)
+            {
+                <li class="page-item">
+                    <a class="page-link bg-dark text-white border-dark" href="@Url.Action(@action, "Topics", new { Page = i, SearchTerm = Model.SearchTerm })">@i</a>
+                </li>
+            }
+            <li class="page-item">
+                <a class="page-link bg-dark text-white border-dark" href="@Url.Action(@action, "Topics", new { Page = next, SearchTerm = Model.SearchTerm })">Next</a>
+            </li>
+        </ul>
+    </nav>
+
+</div>
+
+                    
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const collapsibleButtons = document.querySelectorAll('.collapsible-button');
+
+        collapsibleButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.getAttribute('data-target');
+                const collapsibleContent = document.getElementById(targetId);
+
+                if (collapsibleContent.style.display === 'none' || collapsibleContent.style.display === '') {
+                    collapsibleContent.style.display = 'block';
+                } else {
+                    collapsibleContent.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>

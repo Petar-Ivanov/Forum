@@ -1,0 +1,51 @@
+﻿@model WebApp.ViewModels.Users.DetailsVM
+@using Messaging.Responses.ViewModels;
+@using WebApp.ExtentionMethods;
+@{
+    UserViewModel LoggedUser = this.ViewContext.HttpContext.Session.GetObject<UserViewModel>("loggedUser");
+}
+
+<div class="container mt-5">
+    <div class="card bg-dark text-white">
+        <div class="card-header">
+            <h4 class="card-title">User Profile</h4>
+            @if (LoggedUser.Id == Model.Id)
+            {
+                <form method="get" action="@Url.Action("Edit", "Users")" style="display: inline;">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-dark" data-toggle="tooltip" data-placement="bottom" title="Edit">
+                        Edit
+                    </button>
+                </form>
+                <form method="get" action="@Url.Action("Delete", "Users")" style="display: inline;">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-dark" data-toggle="tooltip" data-placement="bottom" title="Delete">
+                        Delete
+                    </button>
+                </form>
+            }
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <h5 class="card-subtitle mb-2 text-muted">Username</h5>
+                <p class="card-text">@Model.Username</p>
+            </div>
+            <div class="mb-3">
+                <h5 class="card-subtitle mb-2 text-muted">Email</h5>
+                <p class="card-text">@Model.Email</p>
+            </div>
+            <div class="mb-3">
+                <h5 class="card-subtitle mb-2 text-muted">Country</h5>
+                <p class="card-text">@Model.Country</p>
+            </div>
+            <div class="mb-3">
+                <h5 class="card-subtitle mb-2 text-muted">Birth Date</h5>
+                <p class="card-text">@Model.BirthDay.Date.ToShortDateString()</p>
+            </div>
+            <div class="mb-3">
+                <h5 class="card-subtitle mb-2 text-muted">Bio</h5>
+                <p class="card-text">@Model.Biography</p>
+            </div>
+        </div>
+    </div>
+</div>

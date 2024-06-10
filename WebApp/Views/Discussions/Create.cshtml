@@ -1,0 +1,121 @@
+﻿@model WebApp.ViewModels.Discussions.CreateVM
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <h1>New Discussion</h1>
+            <br /><br />
+            <form method="post" action="@Url.Action("Create", "Discussions")" enctype="multipart/form-data" style="max-width: 40rem;">
+                <!-- Title -->
+                <div class="form-group d-flex justify-content-between align-items-center">
+                    <label for="Title" class="ml-3 text-white">Title</label>
+                    <input type="text" class="form-control bg-dark text-white border-dark w-75" id="Title" name="Title" placeholder="Discussion Title" value="@Model.Title">
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                    @if (Model.UniqueTitleError ?? false)
+                    {
+                        <p class="text-danger">*Title must be unique!</p>
+                    }
+                </div>
+                <br />
+
+                <!-- Discussion Text -->
+                <div class="form-group">
+                    <label for="Text" class="text-white">Discussion Text</label>
+                    <textarea class="form-control bg-dark text-white border-dark" id="Text" name="Text" rows="5" placeholder="Discussion Text">@Model.Text</textarea>
+                    <span asp-validation-for="Text" class="text-danger"></span>
+                </div>
+                <br />
+
+                <!-- Discussion Image -->
+                <div class="form-group d-flex justify-content-between align-items-center">
+                    <label for="ImageUpload" class="text-white">Upload Image</label>
+                    <input type="file" class="form-control-file bg-dark text-white border-dark" accept="image/*" id="ImageUpload" name="Image">
+                </div>
+                <br />
+
+                <input type="hidden" name="TopicsSerialized" value="@System.Text.Json.JsonSerializer.Serialize(Model.Topics)" />
+                <!-- Topics Selection -->
+                <div class="form-group">
+                    <label for="topics">Select Topics</label>
+                    <select id="topics" name="SelectedTopicIds" class="form-control" multiple="multiple" size="5">
+                        @foreach (var topic in Model.Topics)
+                        {
+                            @* <option value="@topic.Id">@topic.Name</option> *@
+                            if (Model.SelectedTopicIds!=null && Model.SelectedTopicIds.Contains(topic.Id ?? 1))
+                            {
+                                <option value="@topic.Id" selected>@topic.Name</option>
+                            }
+                            else {
+                                <option value="@topic.Id">@topic.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+                
+                <!-- Submit Button -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-dark w-100">Submit</button>
+                </div>
+                <br />
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@* @model WebApp.ViewModels.Discussions.CreateVM
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <form method="post" action="@Url.Action("Create", "Discussions")" class="form-inline d-flex justify-content-center mb-3" style="max-width: 40rem;">
+                
+                <div class="form-group mx-sm-3 mb-2" style="flex-grow: 1;">
+                    <label for="inputSearch" class="sr-only">Title</label>
+                    <input type="text" class="form-control w-100 bg-dark text-white border-dark" id="inputSearch" placeholder="Search">
+                </div>
+                <button type="submit" class="btn btn-dark mb-2">Search</button> 
+            </form>
+        </div>
+    </div>
+</div> 
+*@
+
+
+
+@* <fieldset>
+    <legend>CREATE DISCUSSION</legend>
+    <form action="/Discussions/Create" method="post">
+        <div class="grid">
+            <div class="row">
+                <div class="col-1">
+                    @Html.LabelFor(m => m.Title)
+                </div>
+                <div class="col-2">
+                    @Html.TextBoxFor(m => m.Title)
+                </div>
+                <div class="col-2">
+                    @Html.ValidationMessageFor(m => m.Title)
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-1">
+                    @Html.LabelFor(m => m.Text)
+                </div>
+                <div class="col-2">
+                    @Html.TextAreaFor(m => m.Text)
+                </div>
+                <div class="col-2">
+                    @Html.ValidationMessageFor(m => m.Text)
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-1"></div>
+                <div class="col-2">
+                    <input type="submit" class="right" value="Save" />
+                    <a href="/Projects/Index" class="right">Back</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</fieldset> *@
